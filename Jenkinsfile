@@ -9,14 +9,6 @@ pipeline {
   }
 
   stages {
-
-    stage('Checkout') {
-      steps {
-        git credentialsId: 'GITHUB_TOKEN',
-            url: 'https://github.com/Moni040/flask-mysql-devops-pipeline.git'
-      }
-    }
-
     stage('Test') {
       steps {
         sh '''
