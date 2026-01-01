@@ -12,7 +12,18 @@ pipeline {
     stage('Test') {
       steps {
        sh '''
+        cd ~/flask-mysql-devops-pipeline
+
+        sudo apt update
+        sudo apt install -y python3-venv python3-pip
+        python3 -m venv venv
+        source venv/bin/activate
+        pip install --upgrade pip
+        pip install pytest
+        PYTHONPATH=$(pwd) pytest tests/
+
         pytest tests/
+
       '''
       }
     }
