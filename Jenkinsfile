@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   environment {
-    EC2_HOST = "ubuntu@YOUR_EC2_PUBLIC_IP"
+    EC2_HOST = "ubuntu@3.236.239.82"
     APP_DIR = "flask-mysql-ci-cd"
     DB_NAME = "appdb"
     DB_USER = "appuser"
@@ -13,7 +13,7 @@ pipeline {
     stage('Checkout') {
       steps {
         git credentialsId: 'GITHUB_TOKEN',
-            url: 'GITHUB_REPO_URL'
+            url: 'https://github.com/Moni040/flask-mysql-devops-pipeline.git'
       }
     }
 
