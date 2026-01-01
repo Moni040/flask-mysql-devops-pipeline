@@ -12,7 +12,7 @@ pipeline {
     stage('Test') {
       steps {
        sh '''
-        cd ~/flask-mysql-devops-pipeline
+        cd flask-mysql-devops-pipeline
 
         sudo apt update
         sudo apt install -y python3-venv python3-pip
