@@ -12,10 +12,11 @@ pipeline {
     stage('Test') {
       steps {
         sh '''
-          python3 -m pip install pytest
-          pytest tests/
+          sudo apt update && sudo apt install -y python3-pip
+          python3 -m pip install --user pytest
+          python3 -m pytest tests/
         '''
-      }
+     }
     }
 
 
