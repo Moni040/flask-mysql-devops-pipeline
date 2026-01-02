@@ -40,11 +40,13 @@ pipeline {
             sh '''
               rsync -avz -e "ssh -o StrictHostKeyChecking=no" . ${EC2_HOST}:${APP_DIR}
               ssh -o StrictHostKeyChecking=no ${EC2_HOST} "
+                cd ${APP_DIR}
+                chmod +x deploy.sh
                 export DB_NAME=${DB_NAME}
                 export DB_USER=${DB_USER}
                 export DB_PASSWORD=${DB_PASSWORD}
                 export DB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
-                cd ${APP_DIR} && ./deploy.sh
+                ./deploy.sh
               "
             '''
           }
