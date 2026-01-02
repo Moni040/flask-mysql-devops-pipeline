@@ -38,8 +38,8 @@ pipeline {
             string(credentialsId: 'DB_ROOT_PASSWORD', variable: 'DB_ROOT_PASSWORD')
           ]) {
             sh '''
-              rsync -avz . ${EC2_HOST}:${APP_DIR}
-              ssh ${EC2_HOST} "
+              rsync -avz -e "ssh -o StrictHostKeyChecking=no" . ${EC2_HOST}:${APP_DIR}
+              ssh -o StrictHostKeyChecking=no ${EC2_HOST} "
                 export DB_NAME=${DB_NAME}
                 export DB_USER=${DB_USER}
                 export DB_PASSWORD=${DB_PASSWORD}
