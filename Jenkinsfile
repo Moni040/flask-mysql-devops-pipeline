@@ -1,13 +1,5 @@
 pipeline {
   agent any
-
-  environment {
-    EC2_HOST = "ubuntu@3.237.41.230"
-    APP_DIR = "flask-mysql-ci-cd"
-    DB_NAME = "appdb"
-    DB_USER = "appuser"
-  }
-
   stages {
     stage('Test') {
      steps {
@@ -35,7 +27,10 @@ pipeline {
         sshagent(['EC2_SSH_KEY']) {
           withCredentials([
             string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD'),
-            string(credentialsId: 'DB_ROOT_PASSWORD', variable: 'DB_ROOT_PASSWORD')
+            string(credentialsId: 'DB_ROOT_PASSWORD', variable: 'DB_ROOT_PASSWORD'),
+            string(credentialsId: 'EC2_HOST', variable: 'ubuntu@100.48.76.244'),
+            string(credentialsId: 'DB_NAME', variable: 'appdb'),
+            string(credentialsId: 'DB_USER', variable: 'appuser')
           ]) {
             sh '''
               rsync -avz . ${EC2_HOST}:${APP_DIR}
