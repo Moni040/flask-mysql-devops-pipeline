@@ -348,20 +348,152 @@ pytest tests/
 ---
 
 ## 🔁 Redeployment Flow
+Step 1: 
 
-```bash
-git commit -m "change"
-git push
-```
+🔔 GitHub Webhook Configuration (Auto Trigger Jenkins on Push)
 
-Jenkins automatically redeploys.
+This project uses a GitHub Webhook so that every push to the repository automatically triggers the Jenkins pipeline.
 
----
+🔹 Why a Webhook Is Needed
+
+Without a webhook:
+
+Jenkins must poll GitHub repeatedly (inefficient)
+
+With a webhook:
+
+GitHub notifies Jenkins instantly
+
+CI/CD pipeline starts immediately after git push
+
+📍 Where to Configure the Webhook (IMPORTANT)
+
+The webhook is configured inside your GitHub repository,
+NOT in Jenkins, and NOT on the EC2 terminal.
+
+🪜 Step-by-Step Webhook Setup
+1️⃣ Open Your GitHub Repository
+
+Example:
+
+https://github.com/<YOUR_USERNAME>/<YOUR_REPO_NAME>
+
+2️⃣ Go to Repository Settings
+
+Click Settings (top menu)
+
+In the left sidebar, click Webhooks
+
+3️⃣ Click Add webhook
+
+Fill in the details exactly as below:
+
+🔹 Payload URL
+http://<JENKINS_EC2_PUBLIC_IP>:8080/github-webhook/
+
+
+✅ Example:
+
+http://18.211.xxx.xxx:8080/github-webhook/
+
+
+⚠️ Trailing slash / is mandatory
+
+🔹 Content type
+application/json
+
+🔹 Secret (Optional)
+
+Leave empty for now
+
+Can be added later for security
+
+🔹 SSL Verification
+
+❌ Disable (if using HTTP)
+
+✅ Enable only if Jenkins is behind HTTPS
+
+🔹 Which events would you like to trigger this webhook?
+
+Select:
+
+☑ Just the push event
+
+🔹 Active
+☑ Checked
+
+4️⃣ Click Add webhook
+✅ Jenkins Side Configuration (VERY IMPORTANT)
+
+In your Jenkins pipeline job:
+
+Go to Jenkins Dashboard
+
+Open your pipeline job
+
+Click Configure
+
+Under Build Triggers, enable:
+
+☑ GitHub hook trigger for GITScm polling
+
+
+Save
+
+🧪 How to Verify Webhook Is Working
+1️⃣ Make a Git Push
+git commit -m "test webhook"
+git push origin main
+
+2️⃣ Check Jenkins
+
+Jenkins job should start automatically
+
+No manual “Build Now” required
+
+3️⃣ Check Webhook Delivery Status in GitHub
+
+GitHub Repo → Settings → Webhooks
+
+Click the webhook
+
+Scroll to Recent Deliveries
+
+You should see:
+
+✔ 200 OK
+
+
+If you see:
+
+❌ 404 → Wrong URL
+
+❌ Timeout → Jenkins SG / port 8080 blocked
+
+❌ 403 → Jenkins trigger not enabled
+
+❗ Common Webhook Issues & Fixes
+❌ Jenkins not triggered
+
+✔ Check Jenkins EC2 Security Group allows port 8080 from your IP
+✔ Verify Jenkins is running
+✔ Ensure trailing /github-webhook/
+
+❌ “Hook should contain event type”
+
+✔ Content-Type must be application/json
+✔ Push event must be enabled
+
+❌ Works manually but not on push
+
+✔ Ensure Build Triggers → GitHub hook trigger is enabled in Jenkins job
+
 
 ## 🛑 Cleanup (Destroy Everything)
 
 ```bash
-terraform destroy -var="my_ip=49.37.182.91/32"
+terraform destroy
 ```
 
 ---
