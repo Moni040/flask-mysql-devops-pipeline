@@ -348,146 +348,208 @@ pytest tests/
 ---
 
 ## 🔁 Redeployment Flow
-Step 1: 
 
-🔔 GitHub Webhook Configuration (Auto Trigger Jenkins on Push)
+## 🔔 GitHub Webhook Configuration (Auto Trigger Jenkins on Push)
 
-This project uses a GitHub Webhook so that every push to the repository automatically triggers the Jenkins pipeline.
+This project uses a **GitHub Webhook** so that **every push to the repository automatically triggers the Jenkins pipeline**.
 
-🔹 Why a Webhook Is Needed
+---
+
+### 🔹 Why a Webhook Is Needed
 
 Without a webhook:
 
-Jenkins must poll GitHub repeatedly (inefficient)
+* Jenkins must **poll GitHub** repeatedly (inefficient)
 
 With a webhook:
 
-GitHub notifies Jenkins instantly
+* GitHub **notifies Jenkins instantly**
+* CI/CD pipeline starts immediately after `git push`
 
-CI/CD pipeline starts immediately after git push
+---
 
-📍 Where to Configure the Webhook (IMPORTANT)
+## 📍 Where to Configure the Webhook (IMPORTANT)
 
-The webhook is configured inside your GitHub repository,
-NOT in Jenkins, and NOT on the EC2 terminal.
+> The webhook is configured **inside your GitHub repository**,
+> **NOT in Jenkins**, and **NOT on the EC2 terminal**.
 
-🪜 Step-by-Step Webhook Setup
-1️⃣ Open Your GitHub Repository
+---
+
+## 🪜 Step-by-Step Webhook Setup
+
+### 1️⃣ Open Your GitHub Repository
 
 Example:
 
+```
 https://github.com/<YOUR_USERNAME>/<YOUR_REPO_NAME>
+```
 
-2️⃣ Go to Repository Settings
+---
 
-Click Settings (top menu)
+### 2️⃣ Go to Repository Settings
 
-In the left sidebar, click Webhooks
+* Click **Settings** (top menu)
+* In the left sidebar, click **Webhooks**
 
-3️⃣ Click Add webhook
+---
+
+### 3️⃣ Click **Add webhook**
 
 Fill in the details exactly as below:
 
-🔹 Payload URL
-http://<JENKINS_EC2_PUBLIC_IP>:8080/github-webhook/
+#### 🔹 Payload URL
 
+```
+http://<JENKINS_EC2_PUBLIC_IP>:8080/github-webhook/
+```
 
 ✅ Example:
 
+```
 http://18.211.xxx.xxx:8080/github-webhook/
+```
 
+⚠️ **Trailing slash `/` is mandatory**
 
-⚠️ Trailing slash / is mandatory
+---
 
-🔹 Content type
+#### 🔹 Content type
+
+```
 application/json
+```
 
-🔹 Secret (Optional)
+---
 
-Leave empty for now
+#### 🔹 Secret (Optional)
 
-Can be added later for security
+* Leave empty for now
+* Can be added later for security
 
-🔹 SSL Verification
+---
 
-❌ Disable (if using HTTP)
+#### 🔹 SSL Verification
 
-✅ Enable only if Jenkins is behind HTTPS
+* ❌ Disable (if using HTTP)
+* ✅ Enable only if Jenkins is behind HTTPS
 
-🔹 Which events would you like to trigger this webhook?
+---
+
+#### 🔹 Which events would you like to trigger this webhook?
 
 Select:
 
+```
 ☑ Just the push event
+```
 
-🔹 Active
+---
+
+#### 🔹 Active
+
+```
 ☑ Checked
+```
 
-4️⃣ Click Add webhook
-✅ Jenkins Side Configuration (VERY IMPORTANT)
+---
+
+### 4️⃣ Click **Add webhook**
+
+---
+
+## ✅ Jenkins Side Configuration (VERY IMPORTANT)
 
 In your Jenkins pipeline job:
 
-Go to Jenkins Dashboard
+1. Go to **Jenkins Dashboard**
+2. Open your pipeline job
+3. Click **Configure**
+4. Under **Build Triggers**, enable:
 
-Open your pipeline job
-
-Click Configure
-
-Under Build Triggers, enable:
-
+```
 ☑ GitHub hook trigger for GITScm polling
+```
 
+5. Save
 
-Save
+---
 
-🧪 How to Verify Webhook Is Working
-1️⃣ Make a Git Push
+## 🧪 How to Verify Webhook Is Working
+
+### 1️⃣ Make a Git Push
+
+```bash
 git commit -m "test webhook"
 git push origin main
+```
 
-2️⃣ Check Jenkins
+---
 
-Jenkins job should start automatically
+### 2️⃣ Check Jenkins
 
-No manual “Build Now” required
+* Jenkins job should **start automatically**
+* No manual “Build Now” required
 
-3️⃣ Check Webhook Delivery Status in GitHub
+---
 
-GitHub Repo → Settings → Webhooks
+### 3️⃣ Check Webhook Delivery Status in GitHub
 
-Click the webhook
-
-Scroll to Recent Deliveries
+* GitHub Repo → **Settings → Webhooks**
+* Click the webhook
+* Scroll to **Recent Deliveries**
 
 You should see:
 
+```
 ✔ 200 OK
-
+```
 
 If you see:
 
-❌ 404 → Wrong URL
+* ❌ 404 → Wrong URL
+* ❌ Timeout → Jenkins SG / port 8080 blocked
+* ❌ 403 → Jenkins trigger not enabled
 
-❌ Timeout → Jenkins SG / port 8080 blocked
+---
 
-❌ 403 → Jenkins trigger not enabled
+## ❗ Common Webhook Issues & Fixes
 
-❗ Common Webhook Issues & Fixes
-❌ Jenkins not triggered
+### ❌ Jenkins not triggered
 
-✔ Check Jenkins EC2 Security Group allows port 8080 from your IP
+✔ Check Jenkins EC2 Security Group allows **port 8080** from your IP
 ✔ Verify Jenkins is running
-✔ Ensure trailing /github-webhook/
+✔ Ensure trailing `/github-webhook/`
 
-❌ “Hook should contain event type”
+---
 
-✔ Content-Type must be application/json
+### ❌ “Hook should contain event type”
+
+✔ Content-Type must be `application/json`
 ✔ Push event must be enabled
 
-❌ Works manually but not on push
+---
 
-✔ Ensure Build Triggers → GitHub hook trigger is enabled in Jenkins job
+### ❌ Works manually but not on push
+
+✔ Ensure **Build Triggers → GitHub hook trigger** is enabled in Jenkins job
+
+
+---
+
+## ✅ Webhook Checklist
+
+✔ Webhook configured in GitHub
+✔ Correct Jenkins URL
+✔ `/github-webhook/` endpoint
+✔ Jenkins trigger enabled
+✔ Push triggers build automatically
+
+---
+
+### ✅ That’s it
+
+Once this is configured, **your entire pipeline becomes fully automated**.
 
 
 ## 🛑 Cleanup (Destroy Everything)
