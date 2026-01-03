@@ -2,10 +2,11 @@ pipeline {
   agent any
 
   environment {
-    EC2_HOST = "ubuntu@100.48.76.244"
+    EC2_HOST = "ubuntu@3.235.147.254"
     APP_DIR = "flask-mysql-ci-cd"
     DB_NAME = "appdb"
     DB_USER = "appuser"
+    
   }
 
   stages {
